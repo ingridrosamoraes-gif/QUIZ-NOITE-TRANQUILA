@@ -777,8 +777,20 @@
             </ul>
           </div>
 
-          ${fim ? `<div class="lancamento">Preço de lançamento termina em <b id="cronometro">--:--:--</b><br><span>Depois, o ${esc(CONFIG.produto)} passa para ${esc(CONFIG.precoDepois)}.</span></div>` : ''}
-
+        ${fim ? \`= `<div style="text-align: center; background-color: #fff8e7; border: 1px dashed #ffa800; padding: 16px; border-radius: 12px; margin: 20px auto; max-width: 480px; font-family: system-ui, -apple-system, sans-serif;">
+  <div style="font-size: 14px; color: #555; margin-bottom: 4px;">
+    De <span style="text-decoration: line-through; color: #999; font-weight: 500;">R$ 197,00</span> por apenas
+  </div>
+  <div style="font-size: 26px; font-weight: 800; color: #28a745; margin-bottom: 8px;">
+    R$ 27,00
+  </div>
+  <div style="font-size: 13px; color: #d9534f; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+    ⚡ O preço de lançamento expira em:
+  </div>
+  <div id="cronometro-oferta" style="font-size: 24px; font-weight: 800; color: #d9534f; margin-top: 4px; font-variant-numeric: tabular-nums;">
+    23:59:59
+  </div>
+</div>` : ''}
           <div class="planos">
             <div class="plano destaque-plano">
               <div class="plano-nome">${esc(CONFIG.produto)}</div>
@@ -861,6 +873,46 @@
   });
 
   mostrar();
-  </script>
+  </script> 
+  <!-- SCRIPT DO CRONÓMETRO REGRESSIVO DE 24H -->
+<script>
+  (function iniciarCronometro() {
+    const TEMPO_TOTAL = 24 * 60 * 60; // 24 horas em segundos
+    let tempoRestante = localStorage.getItem('tempo_cronometro_quiz');
+
+    if (!tempoRestante) {
+      tempoRestante = TEMPO_TOTAL;
+      localStorage.setItem('tempo_cronometro_quiz', tempoRestante);
+    }
+
+    function atualizarRelogio() {
+      let horas = Math.floor(tempoRestante / 3600);
+      let minutos = Math.floor((tempoRestante % 3600) / 60);
+      let segundos = tempoRestante % 60;
+
+      horas = horas < 10 ? '0' + horas : horas;
+      minutos = minutos < 10 ? '0' + minutos : minutos;
+      segundos = segundos < 10 ? '0' + segundos : segundos;
+
+      const elemento = document.getElementById('cronometro-oferta');
+      if (elemento) {
+        elemento.textContent = `${horas}:${minutos}:${segundos}`;
+      } else {
+        const elementoAntigo = document.getElementById('cronometro');
+        if (elementoAntigo) elementoAntigo.textContent = `${horas}:${minutos}:${segundos}`;
+      }
+
+      if (tempoRestante > 0) {
+        tempoRestante--;
+        localStorage.setItem('tempo_cronometro_quiz', tempoRestante);
+      } else {
+        tempoRestante = 4 * 3600; // Reinicia em 4h quando zerar
+      }
+    }
+
+    atualizarRelogio();
+    setInterval(atualizarRelogio, 1000);
+  })();
+</script>
 </body>
 </html>
